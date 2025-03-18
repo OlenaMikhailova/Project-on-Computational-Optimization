@@ -1,0 +1,130 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[ukrainian]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\geometry{left=2cm, right=2cm, top=2cm, bottom=2cm}
+
+\title{Основні означення: Optimization Theory}
+\author{Vladyslav Skrynyk, Olena Mikhailova}
+
+\begin{document}
+
+\maketitle
+
+\section{Основні означення}
+
+\subsection{Опуклість (Convexity)}
+Функція $f: \mathbb{R}^n \to \mathbb{R}$ називається \textbf{опуклою}, якщо для всіх $x, y \in \mathbb{R}^n$ і будь-якого $\lambda \in [0,1]$ виконується:
+\[
+    f(\lambda x + (1 - \lambda)y) \leq \lambda f(x) + (1 - \lambda) f(y). \tag{1}
+\]
+\subsection{Сильна опуклість (Strong Convexity)}
+Якщо в (1) виконується строга нерівнсть.
+
+\subsection{L-smoothness}
+Функція \( f: \Omega \to \mathbb{R} \) є \( L \)-гладкою, якщо її градієнт є 
+\( L \)-Ліпшицевим, тобто виконується нерівність  
+\[
+\|\nabla f(x) - \nabla f(y)\|_2 \leq L \|x - y\|_2, \quad \forall x, y \in \Omega.
+\]
+
+
+\subsection{Лема спуску (Descent Lemma)}
+Нехай \( f: \Omega \to \mathbb{R} \) є \( L \)-гладкою на опуклій області \( \Omega \).  
+Тоді функцію \( f \) можна оцінити зверху наступним чином:
+\[
+f(y) \leq f(x) + \langle \nabla f(x), y - x \rangle + \frac{L}{2} \|y - x\|_2^2, \quad \forall x, y \in \Omega. \quad (2)
+\]
+  
+\textbf{Доведення.} Виразимо приріст \( f(y) - f(x) \) як інтеграл від градієнта уздовж прямої, що з'єднує \( x \) та \( y \),  
+а потім використаємо Ліпшицеву умову на градієнт \( \nabla f \) для оцінки приросту:
+\[
+f(y) - f(x) = \int_0^1 \langle \nabla f(x + t \cdot (y - x)), y - x \rangle \, dt
+\]
+\[
+= \left( \int_0^1 \langle \nabla f(x + t \cdot (y - x)) - \nabla f(x), y - x \rangle \, dt \right) + \langle \nabla f(x), y - x \rangle
+\]
+\[
+\leq \left( \int_0^1 \|\nabla f(x + t \cdot (y - x)) - \nabla f(x)\|_2 \cdot \|y - x\|_2 \, dt \right) + \langle \nabla f(x), y - x \rangle
+\]
+\[
+\leq \left( \int_0^1 t L \|y - x\|_2^2 \, dt \right) + \langle \nabla f(x), y - x \rangle
+\]
+\[
+= \frac{L}{2} \|y - x\|_2^2 + \langle \nabla f(x), y - x \rangle.
+\]
+Перегрупувавши вирази, отримуємо твердження теореми.
+
+\textbf{Теорема (Лема про градієнтний спуск, ДОДАТКОВА).}  
+Нехай \( f: \mathbb{R}^n \to \mathbb{R} \) є \( L \)-гладкою.  
+Тоді для будь-якого \( 0 < \eta \leq \frac{1}{L} \) кожен крок градієнтного спуску (1) гарантує:
+\[
+f(x_{t+1}) \leq f(x_t) - \frac{\eta}{2} \|\nabla f(x_t)\|_2^2.
+\]
+
+
+\subsection{Розмір кроку (Stepsize, Learning rate)}
+Розмір кроку $\alpha_k$ в ітераційному методі визначає, наскільки далеко ми рухаємося в напрямку градієнта:
+\begin{equation}
+    x_{k+1} = x_k - \alpha_k \nabla f(x_k).
+\end{equation}
+
+\subsection{Градієнтний спуск (Gradient Descent)}
+Метод градієнтного спуску визначається рекурентним співвідношенням:
+\begin{equation}
+    x_{k+1} = x_k - \alpha_k \nabla f(x_k),
+\end{equation}
+де $\alpha_k$ — це розмір кроку.
+
+\subsection{Пошук вздовж прямої (Linesearch)}
+Метод визначення оптимального розміру кроку $\alpha_k$ шляхом розв’язання задачі:
+\begin{equation}
+    \alpha_k = \arg\min_{\alpha > 0} f(x_k - \alpha \nabla f(x_k)).
+\end{equation}
+
+\subsubsection{Exact Line-Search}
+Після вибору напрямку (у градієнтному спуску це напрямок негативного градієнта) можна розглянути таку одномірну задачу оптимізації для визначення найкращого розміру кроку:
+
+\[
+\eta_t = \arg\min_{\eta \geq 0} f(x_t - \eta \nabla f(x_t)).
+\]
+
+Часто вирішення цієї задачі точно є обчислювально складним, тому на практиці зазвичай використовують наближений підхід.
+
+\subsubsection{Backtracking Line-Search}
+
+Ідея методу зворотного відстеження (\textit{backtracking line-search}) загалом полягає в тому, щоб спочатку спробувати агресивний (великий) розмір кроку та поступово зменшувати його, якщо він занадто великий.
+
+Алгоритм працює наступним чином: ми вибираємо два параметри $\alpha \in (0, 0.5)$ і $\beta \in (0, 1)$. На ітерації $t$:
+
+\begin{enumerate}
+    \item Ініціалізуємо $\eta = 1$.
+    \item \textbf{Перевірка умови:} якщо 
+    \[
+    f(x_t - \eta \nabla f(x_t)) > f(x_t) - \alpha \eta \|\nabla f(x_t)\|_2^2,
+    \]
+    тоді оновлюємо $\eta := \beta \times \eta$ і повторюємо перевірку.
+    \item В іншому випадку робимо крок:
+    \[
+    x_{t+1} = x_t - \eta \nabla f(x_t).
+    \]
+\end{enumerate}
+
+На практиці часто використовують значення $\alpha = 0.3$ та $\beta = 0.5$, що дає непогані результати.
+
+
+
+\subsection{Метрична проекція (Metric Projection)}
+Метрична проекція точки $x$ на опуклу множину $C$ визначається як
+\begin{equation}
+    P_C(x) = \arg\min_{y \in C} \|x - y\|.
+\end{equation}
+
+\subsection{Швидкість збіжності (Convergence Rate)} TODO
+Швидкість збіжності методу оптимізації характеризує, як швидко послідовність $\{x_k\}$ наближається до оптимального розв’язку $x^*$. Розглядають:
+\begin{itemize}
+    \item Лінійну збіжність: $\|x_k - x^*\| \leq C q^k$, де $q \in (0,1)$.
+    \item Квадратичну збіжність: $\|x_{k+1} - x^*\| \leq C \|x_k - x^*\|^2$.
+\end{itemize}
+
+\end{document}
