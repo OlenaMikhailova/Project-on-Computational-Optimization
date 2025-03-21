@@ -4,40 +4,45 @@
 \usepackage{geometry}
 \geometry{left=2cm, right=2cm, top=2cm, bottom=2cm}
 
-\title{Основні означення: Optimization Theory}
+\title{Fundamental Definitions: Optimization Theory}
 \author{Vladyslav Skrynyk, Olena Mikhailova}
+\date{}
 
 \begin{document}
 
 \maketitle
 
-\section{Основні означення}
+\section{Fundamental Definitions}
 
-\subsection{Опуклість (Convexity)}
-Функція $f: \mathbb{R}^n \to \mathbb{R}$ називається \textbf{опуклою}, якщо для всіх $x, y \in \mathbb{R}^n$ і будь-якого $\lambda \in [0,1]$ виконується:
+\subsection{Convexity}  
+A function $f: \mathbb{R}^n \to \mathbb{R}$ is called \textbf{convex} if for all $x, y \in \mathbb{R}^n$ and any $\lambda \in [0,1]$, the following holds:  
 \[
     f(\lambda x + (1 - \lambda)y) \leq \lambda f(x) + (1 - \lambda) f(y). \tag{1}
-\]
-\subsection{Сильна опуклість (Strong Convexity)}
-Якщо в (1) виконується строга нерівність.
+\]  
+\subsection{Strong Convexity}  
+If a strict inequality holds in (1), the function is called \textbf{strongly convex}.  
 
-\subsection{L-smoothness}
-Функція \( f: \Omega \to \mathbb{R} \) є \( L \)-гладкою, якщо її градієнт є 
-\( L \)-Ліпшицевим, тобто виконується нерівність  
+
+\subsection{L-smoothness}  
+A function \( f: \Omega \to \mathbb{R} \) is called \( L \)-smooth if its gradient is  
+\( L \)-Lipschitz continuous, meaning that the following inequality holds:  
 \[
 \|\nabla f(x) - \nabla f(y)\|_2 \leq L \|x - y\|_2, \quad \forall x, y \in \Omega.
 \]
+
 *градієнт не змінюється надто критично*
 
-\subsection{Лема спуску (Descent Lemma)}
-Нехай \( f: \Omega \to \mathbb{R} \) є \( L \)-гладкою на опуклій області \( \Omega \).  
-Тоді функцію \( f \) можна оцінити зверху наступним чином:
+\subsection{Descent Lemma}  
+Let \( f: \Omega \to \mathbb{R} \) be an \( L \)-smooth function on a convex domain \( \Omega \).  
+Then, the function \( f \) can be upper-bounded as follows:
+
 \[
 f(y) \leq f(x) + \langle \nabla f(x), y - x \rangle + \frac{L}{2} \|y - x\|_2^2, \quad \forall x, y \in \Omega. \quad (2)
 \]
   
-\textbf{Доведення.} Виразимо приріст \( f(y) - f(x) \) як інтеграл від градієнта уздовж прямої, що з'єднує \( x \) та \( y \),  
-а потім використаємо Ліпшицеву умову на градієнт \( \nabla f \) для оцінки приросту:
+\textbf{Proof.} Express the increment \( f(y) - f(x) \) as an integral of the gradient along the line connecting \( x \) and \( y \),  
+and then use the Lipschitz condition on the gradient \( \nabla f \) to estimate the increment:
+
 \[
 f(y) - f(x) = \int_0^1 \langle \nabla f(x + t \cdot (y - x)), y - x \rangle \, dt
 \]
@@ -53,102 +58,111 @@ f(y) - f(x) = \int_0^1 \langle \nabla f(x + t \cdot (y - x)), y - x \rangle \, d
 \[
 = \frac{L}{2} \|y - x\|_2^2 + \langle \nabla f(x), y - x \rangle.
 \]
-Перегрупувавши вирази, отримуємо твердження теореми.
+Rearranging the expressions, we obtain the statement of the theorem.
 
-\textbf{Теорема (Лема про градієнтний спуск, ДОДАТКОВА).}  
-Нехай \( f: \mathbb{R}^n \to \mathbb{R} \) є \( L \)-гладкою.  
-Тоді для будь-якого \( 0 < \eta \leq \frac{1}{L} \) кожен крок градієнтного спуску (1) гарантує:
+
+\textbf{Theorem (Gradient Descent Lemma, Additional).}  
+Let \( f: \mathbb{R}^n \to \mathbb{R} \) be \( L \)-smooth.  
+Then, for any \( 0 < \eta \leq \frac{1}{L} \), each step of gradient descent (1) guarantees:
+
 \[
 f(x_{t+1}) \leq f(x_t) - \frac{\eta}{2} \|\nabla f(x_t)\|_2^2.
 \]
 
 
-\subsection{Розмір кроку (Stepsize, Learning rate)}
-Розмір кроку $\alpha_k$ в ітераційному методі визначає, наскільки далеко ми рухаємося в напрямку градієнта:
+\subsection{Stepsize (Learning Rate)}  
+The stepsize \( \alpha_k \) in an iterative method determines how far we move in the direction of the gradient:
+
 \begin{equation}
     x_{k+1} = x_k - \alpha_k \nabla f(x_k).
 \end{equation}
 
-\subsection{Градієнтний спуск (Gradient Descent)}
-Метод градієнтного спуску визначається рекурентним співвідношенням:
+\subsection{Gradient Descent}  
+The gradient descent method is defined by the recurrence relation:
 \begin{equation}
     x_{k+1} = x_k - \alpha_k \nabla f(x_k),
 \end{equation}
-де $\alpha_k$ — це розмір кроку. Це ітераційний алгоритм оптимізації першого порядку, в якому для знаходження локального(глобального) мінімуму функції здійснюються кроки, пропорційні протилежному значенню градієнту функції в поточній точці.
+where \( \alpha_k \) is the step size. This is a first-order iterative optimization algorithm, where steps are taken proportional to the negative value of the gradient of the function at the current point to find a local (or global) minimum of the function.
 
-\subsection{Пошук вздовж прямої (Linesearch)}
-Метод визначення оптимального розміру кроку $\alpha_k$ шляхом розв’язання задачі:
+\subsection{Linesearch}  
+The method for determining the optimal step size \( \alpha_k \) by solving the following problem:
+
 \begin{equation}
     \alpha_k = \arg\min_{\alpha > 0} f(x_k - \alpha \nabla f(x_k)).
 \end{equation}
 
-\subsubsection{Exact Line-Search}
-Після вибору напрямку (у градієнтному спуску це напрямок негативного градієнта) можна розглянути таку одномірну задачу оптимізації для визначення найкращого розміру кроку:
+\subsubsection{Exact Line-Search}  
+After selecting the direction (in gradient descent, this is the direction of the negative gradient), one can consider the following 1D optimization problem to determine the best step size:
+
 
 \[
 \eta_t = \arg\min_{\eta \geq 0} f(x_t - \eta \nabla f(x_t)).
 \]
 
-Часто вирішення цієї задачі точно є обчислювально складним, тому на практиці зазвичай використовують наближений підхід.
+Often, solving this problem exactly is computationally difficult, so in practice, an approximate approach is usually used.
+
 
 \subsubsection{Backtracking Line-Search}
 
-Ідея методу зворотного відстеження (\textit{backtracking line-search}) загалом полягає в тому, щоб спочатку спробувати агресивний (великий) розмір кроку та поступово зменшувати його, якщо він занадто великий.
+The idea of the backtracking line-search method is generally to first try an aggressive (large) step size and then reduce it if it is too large.
 
-Алгоритм працює наступним чином: ми вибираємо два параметри $\alpha \in (0, 0.5)$ і $\beta \in (0, 1)$. На ітерації $t$:
+The algorithm works as follows: we choose two parameters $\alpha \in (0, 0.5)$ and $\beta \in (0, 1)$. At iteration $t$:
 
 \begin{enumerate}
-    \item Ініціалізуємо $\eta = 1$.
-    \item \textbf{Перевірка умови:} якщо 
+    \item Initiate $\eta = 1$.
+    \item \textbf{Check condition:} if 
     \[
     f(x_t - \eta \nabla f(x_t)) > f(x_t) - \alpha \eta \|\nabla f(x_t)\|_2^2,
     \]
-    тоді оновлюємо $\eta := \beta \times \eta$ і повторюємо перевірку.
-    \item В іншому випадку робимо крок:
+    then update $\eta := \beta \times \eta$ and recheck condition.
+    \item Otherwise:
     \[
     x_{t+1} = x_t - \eta \nabla f(x_t).
     \]
 \end{enumerate}
 
-На практиці часто використовують значення $\alpha = 0.3$ та $\beta = 0.5$, що дає непогані результати.
+In practice, values of $\alpha = 0.3$ and $\beta = 0.5$ are often used, which give good results.
 
+\subsection{Metric Projection}
+The metric projection of a point $x$ onto a convex set $C$ is defined as
 
-
-\subsection{Метрична проекція (Metric Projection)}
-Метрична проекція точки $x$ на опуклу множину $C$ визначається як
 \begin{equation}
     P_C(x) = \arg\min_{y \in C} \|x - y\|.
 \end{equation}
 
-\subsection{Швидкість збіжності (Convergence Rate)} Швидкість збіжності методу оптимізації характеризує, як швидко послідовність $\{x_k\}$ наближається до оптимального розв’язку $x^*$. Розглядають:
+\subsection{Convergence Rate}
+The convergence rate of an optimization method characterizes how quickly the sequence $\{x_k\}$ approaches the optimal solution $x^*$. We consider:
+
 \begin{itemize}
-    \item Лінійну збіжність: $\|x_k - x^*\| \leq C q^k$, де $q \in (0,1)$.
-    \item Квадратичну збіжність: $\|x_{k+1} - x^*\| \leq C \|x_k - x^*\|^2$.
+    \item Linear convergence: $\|x_k - x^*\| \leq C q^k$, where $q \in (0,1)$.
+    \item Quadratic convergence: $\|x_{k+1} - x^*\| \leq C \|x_k - x^*\|^2$.
 \end{itemize}
 
-\subsubsection{Аналіз збіжності}
+\subsubsection{Convergence Analysis}
 
-Припустимо, що функція $f$ є опуклою та диференційовною, її область визначення $\operatorname{dom}(f) = \mathbb{R}^n$, а також градієнт $\nabla f$ є Ліпшицевим з константою $L > 0$:
+Assume that the function $f$ is convex and differentiable, with its domain $\operatorname{dom}(f) = \mathbb{R}^n$, and the gradient $\nabla f$ is Lipschitz continuous with a constant $L > 0$:
+
 
 \[
 \|\nabla f(x) - \nabla f(y)\|_2 \leq L \|x - y\|_2, \quad \forall x, y \in \mathbb{R}^n.
 \]
 
-Або, якщо $f$ двічі диференційовна:
+or, if $f$ twice differentiable:
 
 \[
 \nabla^2 f(x) \preceq L I.
 \]
 
-\textbf{Теорема:} Градієнтний спуск із фіксованим розміром кроку $t \leq \frac{1}{L}$ задовольняє:
+\textbf{Theorem:} Gradient descent with a fixed step size $t \leq \frac{1}{L}$ satisfies:
 
 \[
 f(x^{(k)}) - f^* \leq \frac{\|x^{(0)} - x^*\|_2^2}{2tk}.
 \]
 
-Аналогічний результат справедливий для методу зворотного відстеження, якщо замінити $t$ на $\frac{\beta}{L}$.
+An analogous result holds for the backtracking method, if we replace $t$ with $\frac{\beta}{L}$.
 
-Таким чином, градієнтний спуск має швидкість збіжності $O(1/k)$
+Thus, gradient descent has a convergence rate of $O(1/k)$.
+
 
 *Для того щоб отримати $f(x) - f(x^*) \leq \epsilon$ треба $O(1/\epsilon)$ ітерацій*
 
