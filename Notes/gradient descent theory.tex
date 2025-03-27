@@ -1,0 +1,351 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{algorithm, algpseudocode}
+
+\title{Gradient Descent: Theory}
+\author{Mikhailova Olena}
+\date{27.03.2025}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+
+\begin{document}
+
+\maketitle
+
+\section{Gradient Descent}
+\begin{definition}[Gradient Descent]
+An iterative optimization algorithm for minimizing a differentiable function \( f: \mathbb{R}^n \to \mathbb{R} \). Starting from an initial point \( x_0 \), it updates:
+\[
+x_{k+1} = x_k - \eta_k \nabla f(x_k)
+\]
+where \( \eta_k > 0 \) is the step size (learning rate).
+\end{definition}
+
+\textbf{Motivation:} Follows the direction of steepest descent (\(-\nabla f(x)\)) to reduce \( f(x) \). Can be derived from minimizing a first-order Taylor approximation with a quadratic regularization term:
+\[
+x_{k+1} = \arg\min_y \left\{ f(x_k) + \nabla f(x_k)^T (y - x_k) + \frac{1}{2\eta} \|y - x_k\|^2 \right\}
+\]
+
+\section{Descent Lemma}
+
+\subsection{Preliminary Concepts}
+\begin{definition}[L-Smoothness]
+A function \( f: \mathbb{R}^n \to \mathbb{R} \) is called \textbf{L-smooth} if its gradient is Lipschitz continuous with constant \( L \):
+\[
+\|\nabla f(x) - \nabla f(y)\| \leq L \|x - y\| \quad \forall x, y \in \mathbb{R}^n
+\]
+\end{definition}
+
+\subsection{Main Result}
+\begin{lemma}[Descent Lemma]
+For any L-smooth function \( f \) and \( \forall x, y \in \mathbb{R}^n \):
+\[
+f(y) \leq f(x) + \nabla f(x)^\top (y - x) + \frac{L}{2} \|y - x\|^2
+\]
+\end{lemma}
+
+\begin{proof}
+\textit{Proof via Taylor expansion and L-smoothness:}
+
+1. Start with Taylor's theorem with integral remainder:
+\[
+f(y) = f(x) + \int_0^1 \nabla f(x + t(y - x))^\top (y - x) \, dt
+\]
+
+2. Subtract linear approximation:
+\[
+f(y) - f(x) - \nabla f(x)^\top (y - x) = \int_0^1 [\nabla f(x + t(y - x)) - \nabla f(x)]^\top (y - x) \, dt
+\]
+
+3. Apply Cauchy-Schwarz and L-smoothness:
+\[
+\left| f(y) - f(x) - \nabla f(x)^\top (y - x) \right| \leq \int_0^1 L t \|y - x\|^2 \, dt = \frac{L}{2} \|y - x\|^2
+\]
+
+4. Combine inequalities to get final result.
+\end{proof}
+
+\subsection{Geometric Interpretation}
+The Descent Lemma establishes that L-smooth functions:
+\begin{itemize}
+\item Have \textbf{quadratic upper bounds} on their growth
+\item Cannot deviate too far from their linear approximations
+\item Permit controlled descent steps in gradient methods
+\end{itemize}
+
+\subsection{Connection to Gradient Descent}
+For gradient descent update \( y = x - \eta \nabla f(x) \):
+\[
+f(x_{k+1}) \leq f(x_k) - \eta \|\nabla f(x_k)\|^2 + \frac{L\eta^2}{2} \|\nabla f(x_k)\|^2
+\]
+\begin{theorem}[Descent Guarantee]
+For step size \( \eta \leq 1/L \):
+\[
+f(x_{k+1}) \leq f(x_k) - \frac{\eta}{2} \|\nabla f(x_k)\|^2
+\]
+\end{theorem}
+
+\subsection{Special Case: Quadratic Functions}
+For \( f(x) = \frac{1}{2}x^\top Q x \) with \( Q \succ 0 \):
+\[
+f(y) = f(x) + \nabla f(x)^\top (y - x) + \frac{1}{2}(y - x)^\top Q (y - x)
+\]
+Here \( L = \lambda_{\text{max}}(Q) \), and the Descent Lemma becomes exact.
+
+\subsection{Limitations and Caveats}
+\begin{itemize}
+\item \textbf{Critical Step Size:} Fails for \( \eta > 1/L \)
+\item \textbf{Non-Smooth Functions:} Does not apply to non-differentiable functions
+\item \textbf{Local Property:} Only describes local behavior
+\end{itemize}
+
+\section{Stepsize Selection}
+\subsection{Fixed Stepsize}
+\begin{definition}[L-Smoothness]
+A function \( f \) is \( L \)-smooth if:
+\[
+\|\nabla f(x) - \nabla f(y)\| \leq L\|x - y\| \quad \forall x,y
+\]
+\end{definition}
+
+\begin{theorem}[Optimal Fixed Stepsize]
+For \( L \)-smooth functions, GD with \( \eta = \frac{1}{L} \) guarantees:
+\[
+f(x_{k+1}) \leq f(x_k) - \frac{1}{2L}\|\nabla f(x_k)\|^2
+\]
+\end{theorem}
+
+\begin{proof}
+From the Descent Lemma:
+\[
+f(x_{k+1}) \leq f(x_k) - \eta\|\nabla f(x_k)\|^2 + \frac{L\eta^2}{2}\|\nabla f(x_k)\|^2
+\]
+Substitute \( \eta = \frac{1}{L} \):
+\[
+f(x_{k+1}) \leq f(x_k) - \frac{1}{2L}\|\nabla f(x_k)\|^2 \qedhere
+\]
+\end{proof}
+
+\begin{example}[Quadratic Function]
+For \( f(x) = \frac{1}{2}x^TQx \), optimal stepsize is \( \eta = 2/(\lambda_{\max}(Q) + \lambda_{\min}(Q)) \). With \( \eta = 1/\lambda_{\max}(Q) \), convergence rate becomes:
+\[
+\|x^k - x^*\| \leq \left(\frac{\kappa-1}{\kappa+1}\right)^k \|x^0 - x^*\|
+\]
+where \( \kappa = \lambda_{\max}(Q)/\lambda_{\min}(Q) \).
+\end{example}
+
+\subsection{Adaptive Stepsize Methods}
+
+\subsubsection{Backtracking Line Search}
+\begin{algorithm}[H]
+\caption{Backtracking Line Search}
+\begin{algorithmic}[1]
+\State Initialize \( \eta = \eta_{\text{init}}, \alpha \in (0,0.5), \beta \in (0,1) \)
+\While{ \( f(x - \eta\nabla f(x)) > f(x) - \alpha\eta\|\nabla f(x)\|^2 \) }
+\State \( \eta \gets \beta\eta \)
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Geometric Interpretation:} Maintains Armijo condition ensuring sufficient decrease:
+\begin{equation}
+f(x^+) \leq f(x) - \alpha\eta\|\nabla f(x)\|^2
+\end{equation}
+
+\begin{theorem}[Convergence with Backtracking]
+For \( L \)-smooth \( f \), backtracking GD with \( \eta_{\text{init}} > 0 \) achieves:
+\[
+\min_{1\leq t\leq k} \|\nabla f(x_t)\|^2 \leq \frac{C(f(x_0) - f_*)}{k}
+\]
+where \( C \) depends on \( \alpha, \beta \).
+\end{theorem}
+
+\subsubsection{Exact Line Search}
+\[
+\eta_k = \arg\min_{\eta > 0} f(x_k - \eta\nabla f(x_k))
+\]
+
+\begin{example}[Rayleigh Quotient]
+For quadratic \( f(x) = \frac{1}{2}x^TQx \), exact step:
+\[
+\eta = \frac{\nabla f(x)^T\nabla f(x)}{\nabla f(x)^T Q \nabla f(x)}
+\]
+\end{example}
+
+\subsection{Stepsize for Different Function Classes}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Function Class} & \textbf{Recommended Stepsize} & \textbf{Convergence Rate} \\
+\hline
+Non-convex L-smooth & \( \eta = 1/L \) & \( O(1/\sqrt{k}) \) \\
+Convex L-smooth & \( \eta = 1/L \) & \( O(1/k) \) \\
+\(\mu\)-strongly convex & \( \eta = 2/(\mu + L) \) & Linear \( O(\gamma^k) \) \\
+\hline
+\end{tabular}
+\caption{Stepsize selection guide}
+\end{table}
+
+
+
+\subsection{Practical Considerations}
+\begin{itemize}
+\item For unknown \( L \), use backtracking with \( \eta_{\text{init}} = 1 \)
+\item Monitor function values: \( f(x_{k+1}) < f(x_k) \)
+\item In deep learning: Use adaptive methods (Adam, RMSProp) with step decay
+\end{itemize}
+
+\begin{theorem}[Safe Initialization]
+For any \( L \)-smooth function, backtracking line search with \( \eta_{\text{init}} \geq 1/L \) will accept \( \eta \geq \beta/L \) within \( \lceil \log_\beta(1/L\eta_{\text{init}}) \rceil \) steps.
+\end{theorem}
+
+
+\section{Metric Projection}
+\begin{definition}[Metric Projection]
+Let \( C \subseteq \mathbb{R}^n \) be a closed convex set. The metric projection of a point \( x \in \mathbb{R}^n \) onto \( C \) is defined as:
+\[
+\Pi_C(x) := \arg\min_{y \in C} \|y - x\|_2
+\]
+This is the unique point in \( C \) closest to \( x \) under the Euclidean norm.
+\end{definition}
+
+\subsection{Existence and Uniqueness}
+\begin{theorem}[Existence and Uniqueness]
+For any closed convex set \( C \subseteq \mathbb{R}^n \) and \( x \in \mathbb{R}^n \), the metric projection \( \Pi_C(x) \) exists and is unique.
+\end{theorem}
+
+\begin{proof}
+\textbf{Existence:} The function \( f(y) = \|y - x\|^2 \) is coercive and strictly convex. Since \( C \) is closed, a minimizer exists. \\
+\textbf{Uniqueness:} Strict convexity of \( f \) guarantees uniqueness. If \( y_1, y_2 \) were both minimizers, then \( \frac{y_1 + y_2}{2} \in C \) (by convexity) would yield a lower function value, contradicting minimality.
+\end{proof}
+
+\subsection{Characterizing Inequality}
+\begin{theorem}[Projection Inequality]
+For any \( x \in \mathbb{R}^n \) and \( y \in C \):
+\[
+\langle x - \Pi_C(x), y - \Pi_C(x) \rangle \leq 0
+\]
+Equivalently:
+\[
+\|x - \Pi_C(x)\|^2 \leq \|x - y\|^2 - \|\Pi_C(x) - y\|^2
+\]
+\end{theorem}
+
+\begin{proof}
+Let \( z = \Pi_C(x) \). From the first-order optimality condition:
+\[
+\nabla f(z)^T (y - z) \geq 0 \quad \forall y \in C
+\]
+Since \( \nabla f(z) = 2(z - x) \), this becomes:
+\[
+\langle z - x, y - z \rangle \geq 0 \quad \Rightarrow \quad \langle x - z, y - z \rangle \leq 0
+\]
+The equivalence follows by expanding \( \|x - y\|^2 = \|x - z + z - y\|^2 \).
+\end{proof}
+
+\subsection{Normal Cone Interpretation}
+\begin{theorem}[Normal Cone Characterization]
+\( z = \Pi_C(x) \) if and only if:
+\[
+x - z \in N_C(z)
+\]
+where \( N_C(z) \) is the normal cone to \( C \) at \( z \):
+\[
+N_C(z) := \{ v \in \mathbb{R}^n \mid \langle v, y - z \rangle \leq 0 \ \forall y \in C \}
+\]
+\end{theorem}
+
+\subsection{Examples of Metric Projections}
+\begin{property}[Common Projections]
+\begin{itemize}
+\item \textbf{Affine set}: For \( C = \{x \mid Ax = b\} \):
+\[
+\Pi_C(x) = x - A^\dagger(Ax - b)
+\]
+where \( A^\dagger \) is the Moore-Penrose pseudoinverse.
+
+\item \textbf{Non-negative orthant}: For \( C = \mathbb{R}^n_+ \):
+\[
+(\Pi_C(x))_i = \max(x_i, 0)
+\]
+
+\item \textbf{Euclidean ball}: For \( C = \{y \mid \|y\| \leq r\} \):
+\[
+\Pi_C(x) = \begin{cases}
+x & \text{if } \|x\| \leq r \\
+r \frac{x}{\|x\|} & \text{otherwise}
+\end{cases}
+\]
+\end{itemize}
+\end{property}
+
+\subsection{Projected Gradient Descent}
+\begin{algorithm}[H]
+\caption{Projected Gradient Descent}
+\begin{algorithmic}[1]
+\State Initialize \( x_0 \in C \), step size \( \eta > 0 \)
+\For{\( k = 0, 1, 2, \ldots \)}
+\State \( y_{k+1} = x_k - \eta \nabla f(x_k) \)
+\State \( x_{k+1} = \Pi_C(y_{k+1}) \)
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}[Convergence Guarantee]
+If \( f \) is \( L \)-smooth and convex, with \( \eta = 1/L \):
+\[
+f(x_k) - f_\star \leq \frac{L\|x_0 - x_\star\|^2}{2k}
+\]
+\end{theorem}
+
+\subsection{Key Lemma for Analysis}
+\begin{lemma}[Projection Contraction]
+For any \( x \in \mathbb{R}^n \) and \( z \in C \):
+\[
+\|\Pi_C(x) - z\|^2 \leq \|x - z\|^2 - \|\Pi_C(x) - x\|^2
+\]
+\end{lemma}
+
+\begin{proof}
+Using the characterizing inequality with \( y = z \):
+\[
+\|x - \Pi_C(x)\|^2 \leq \|x - z\|^2 - \|\Pi_C(x) - z\|^2
+\]
+Rearranging gives the result.
+\end{proof}
+
+\section{Convergence Rates}
+\subsection{Non-Convex Functions}
+For \( L \)-smooth \( f \), GD achieves:
+\[
+\min_{0 \leq t \leq k} \|\nabla f(x_t)\|^2 \leq \frac{2L(f(x_0) - f_\star)}{k}
+\]
+Rate: \( O(1/\sqrt{k}) \).
+
+\subsection{Convex Functions}
+For \( L \)-smooth convex \( f \), GD achieves:
+\[
+f(x_k) - f_\star \leq \frac{L\|x_0 - x_\star\|^2}{2k}
+\]
+Rate: \( O(1/k) \).
+
+\subsection{Strongly Convex Functions}
+For \( \mu \)-strongly convex and \( L \)-smooth \( f \), GD achieves linear convergence:
+\[
+f(x_k) - f_\star \leq \left(1 - \frac{\mu}{L}\right)^k (f(x_0) - f_\star)
+\]
+Rate: \( O(\log(1/\epsilon)) \) iterations to reach \( \epsilon \)-accuracy.
+
+\begin{theorem}[Convergence under PL Condition]
+If \( f \) satisfies Polyak-Łojasiewicz inequality:
+\[
+\frac{1}{2}\|\nabla f(x)\|^2 \geq \mu(f(x) - f_\star)
+\]
+then GD converges linearly even without strong convexity.
+\end{theorem}
+
+\end{document}
