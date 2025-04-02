@@ -17,7 +17,25 @@
     
     \item \textbf{Solution 1}
     
-    {\fontsize{12}{14}\selectfont (Provide the solution for Problem 1 here.)}
+	Since $f$ is continuous on the compact interval $[a,b]$, by the extreme value theorem, $f$ attains its minimum at some point $x_0 \in [a,b]$. That is,
+\[
+f(x_0) \leq f(x) \quad \forall x \in [a,b].
+\]
+
+Suppose, for the sake of contradiction, that there exists another point $x_1 \in [a,b]$, with $x_0 \neq x_1$, such that $f(x_0) = f(x_1)$, i.e., $x_0$ and $x_1$ are both global minima.
+
+Since $f$ is strictly convex, for any $t \in (0,1)$, the combination $x_t = t x_0 + (1-t) x_1$ satisfies:
+\[
+f(x_t) < t f(x_0) + (1-t) f(x_1).
+\]
+Substituting $f(x_0) = f(x_1)$, we get:
+\[
+f(x_t) < t f(x_0) + (1-t) f(x_0) = f(x_0).
+\]
+This contradicts the assumption that $f(x_0)$ is a global minimum, as it implies the existence of a point $x_t$ where $f(x_t) < f(x_0)$.
+
+Thus, our assumption that $f$ has more than one global minimum must be false, meaning that $f$ has a unique global minimum. 
+  
     
     \item \textbf{Problem 2}
     
