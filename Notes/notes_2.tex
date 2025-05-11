@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[english]{babel}
+\usepackage{hyperref}
 
 \usepackage{amsmath, amssymb}
 \usepackage{mathtools}
@@ -119,7 +120,7 @@ Re-arranging the above we have that
 f(x^T) - f(x^*) = \delta_T \leq \frac{1}{\beta T} = \frac{2L \|x^0 - x^*\|^2}{T}.
 \]
 
-\section*{Proof of Convergence of Gradient Descent with weighted inner product}
+%\section*{Proof of Convergence of Gradient Descent with weighted inner product}
 
 %\textbf{Proof.} Consider the norm induced by \(P\): \( \|x\|_P^2 = x^\top P x \). Then,
 %\begin{align*}
@@ -170,22 +171,98 @@ f(x^T) - f(x^*) = \delta_T \leq \frac{1}{\beta T} = \frac{2L \|x^0 - x^*\|^2}{T}
 %\]
 %\qed
 
-\section*{Main Results}
+\section*{Proof of Convergence of Gradient Descent with weighted inner product}
 
-We consider gradient descent in a space equipped with a weighted inner product:
-\[
-\langle x, y \rangle_P := \langle P x, y \rangle = x^\top P y,
-\]
-where \(P\) is a symmetric positive definite matrix.
+From now on, we will use the following notions:
 
-In this geometry, the gradient descent update takes the form:
+\begin{align*}
+    \nabla f(x) &= P \nabla_P f(x), \\
+    P^{-1} \nabla f(x) &= \nabla_P f(x), \\
+    x_{t+1} &= x_t - \eta \nabla_P f(x_t) 
+    \quad \Leftrightarrow \quad 
+    x_{t+1} = x_t - \eta P^{-1} \nabla f(x_t).
+\end{align*}
+
+If you see an inner product written without the subscript \(P\), this is done deliberately and refers to the standard Euclidean inner product. 
+
+\textbf{Proof.} Consider the norm induced by \(P\): \( \|x\|_P^2 = x^\top P x \). Then the gradient step becomes
 \[
 x_{t+1} = x_t - \eta P^{-1} \nabla f(x_t),
 \]
-where \(\eta > 0\) is the learning rate and \(\nabla f(x_t)\) is the usual Euclidean gradient.
+which can be written as
+\[
+x_{t+1} - x^* = x_t - x^* - \eta P^{-1} \nabla f(x_t).
+\]
+Taking the squared \(P\)-norm of both sides:
+\begin{align*}
+\|x_{t+1} - x^*\|_P^2 
+&= \left\|x_t - x^* - \eta P^{-1} \nabla f(x_t)\right\|_P^2 \\
+&= \|x_t - x^*\|_P^2 - 2\eta \langle P^{-1} \nabla f(x_t), x_t - x^* \rangle_P + \eta^2 \|P^{-1} \nabla f(x_t)\|_P^2 \\
+&= \|x_t - x^*\|_P^2 - 2\eta \langle \nabla f(x_t), x_t - x^* \rangle + \eta^2 \nabla f(x_t)^\top P^{-1} \nabla f(x_t),
+\end{align*}
+where we used the identity \(\langle u, v \rangle_P = u^\top P v\) and the fact that \(P P^{-1} = I\).
 
-This is equivalent to performing preconditioned gradient descent with preconditioner \(P^{-1}\), which adapts the step direction to the local geometry defined by \(P\).
+Now, suppose \(f\) is convex and \(L_P\)-smooth with respect to the \(P\)-norm. Then, from standard smoothness inequality:
+\[
+f(x_{t+1}) \le f(x_t) + \langle \nabla f(x_t), x_{t+1} - x_t \rangle + \frac{L_P}{2} \|x_{t+1} - x_t\|_P^2. \tag{?}
+\]
+Substitute \(x_{t+1} - x_t = -\eta P^{-1} \nabla f(x_t)\):
+\begin{align*}
+f(x_{t+1}) 
+&\le f(x_t) - \eta \nabla f(x_t)^\top P^{-1} \nabla f(x_t) + \frac{L_P \eta^2}{2} \nabla f(x_t)^\top P^{-1} \nabla f(x_t) \\
+&= f(x_t) - \left( \eta - \frac{L_P \eta^2}{2} \right) \nabla f(x_t)^\top P^{-1} \nabla f(x_t).
+\end{align*}
 
+Choosing \( \eta = \frac{1}{L_P} \), we obtain:
+\[
+f(x_{t+1}) \le f(x_t) - \frac{1}{2 L_P} \nabla f(x_t)^\top P^{-1} \nabla f(x_t).
+\]
+
+From convexity, we also have:
+\[
+f(x_t) - f(x^*) \le \langle \nabla f(x_t), x_t - x^* \rangle.
+\]
+Using Cauchy-Schwarz in \(P\)-norm (It was assumed that Cauchy-Schwarz inequality hold in any weighted inner product space? \href{https://math.stackexchange.com/questions/463073/why-does-the-cauchy-schwarz-inequality-hold-in-any-inner-product-space}{Link}):
+\[
+\langle \nabla f(x_t), x_t - x^* \rangle \le \|x_t - x^*\|_P \cdot \|P^{-1} \nabla f(x_t)\|_P.
+\]
+Note that:
+\[
+\|P^{-1} \nabla f(x_t)\|_P^2 = \nabla f(x_t)^\top P^{-1} \nabla f(x_t).
+\]
+
+So we get:
+\[
+f(x_t) - f(x^*) \le \|x_t - x^*\|_P \cdot \sqrt{\nabla f(x_t)^\top P^{-1} \nabla f(x_t)} \le \|x_0 - x^*\|_P \cdot \sqrt{\nabla f(x_t)^\top P^{-1} \nabla f(x_t)}.
+\]
+
+Solving for \( \nabla f(x_t)^\top P^{-1} \nabla f(x_t) \) and plugging into the earlier bound:
+\[
+f(x_{t+1}) - f(x^*) \le f(x_t) - f(x^*) - \frac{1}{2 L_P} \cdot \frac{(f(x_t) - f(x^*))^2}{\|x_0 - x^*\|_P^2}.
+\]
+
+Letting \( \delta_t = f(x_t) - f(x^*) \), and \( \beta = \frac{1}{2 L_P \|x_0 - x^*\|_P^2} \), we obtain:
+\[
+\delta_{t+1} \le \delta_t - \beta \delta_t^2.
+\]
+
+As in standard analysis, we get ($t = 0, \dots, T - 1$):
+
+\[
+\delta_{t+1} \leq \delta_t - \beta \delta_t^2 \xleftrightarrow{\times \frac{1}{\delta_t \delta_{t+1}}}
+\beta \frac{\delta_t}{\delta_{t+1}} \leq \frac{1}{\delta_{t+1}} - \frac{1}{\delta_t}
+\xleftrightarrow{\delta_{t+1} \leq \delta_t}
+\beta \leq \frac{1}{\delta_{t+1}} - \frac{1}{\delta_t}.
+\]
+
+\[
+\beta \le \frac{1}{\delta_{t+1}} - \frac{1}{\delta_t} \quad \Rightarrow \quad T \beta \le \frac{1}{\delta_T} - \frac{1}{\delta_0} \le \frac{1}{\delta_T},
+\]
+which implies:
+\[
+f(x_T) - f(x^*) = \delta_T \le \frac{1}{\beta T} = \frac{2 L_P \|x^0 - x^*\|_P^2}{T}.
+\]
+\qed
 
 \end{document}
  
