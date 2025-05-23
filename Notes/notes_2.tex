@@ -12,6 +12,11 @@
 \newcommand{\lr}[1]{\langle #1\rangle}
 \newcommand{\R}{\mathbb{R}}
 
+
+\usepackage[colorinlistoftodos,prependcaption,backgroundcolor=black!5!white,bordercolor=red]{todonotes}
+\newcommand{\yura}[1]{\todo[inline]{{\textbf{Yura:} \emph{#1}}}}
+
+
 \title{Gradient Descent with Weighted Inner Product}
 \date{}
 \begin{document}
@@ -202,7 +207,9 @@ Taking the squared \(P\)-norm of both sides:
 \end{align*}
 where we used the identity \(\langle u, v \rangle_P = u^\top P v\) and the fact that \(P P^{-1} = I\).
 
-Now, suppose \(f\) is convex and \(L_P\)-smooth with respect to the \(P\)-norm. Then, from standard smoothness inequality:
+Now, suppose \(f\) is convex and \(L_P\)-smooth with respect to the \(P\)-norm.
+\yura{What does it mean? And why is the next inequality true?}
+Then, from standard smoothness inequality:
 \[
 f(x_{t+1}) \le f(x_t) + \langle \nabla f(x_t), x_{t+1} - x_t \rangle + \frac{L_P}{2} \|x_{t+1} - x_t\|_P^2. \tag{?}
 \]
@@ -223,6 +230,7 @@ From convexity, we also have:
 f(x_t) - f(x^*) \le \langle \nabla f(x_t), x_t - x^* \rangle.
 \]
 Using Cauchy-Schwarz in \(P\)-norm (It was assumed that Cauchy-Schwarz inequality hold in any weighted inner product space? \href{https://math.stackexchange.com/questions/463073/why-does-the-cauchy-schwarz-inequality-hold-in-any-inner-product-space}{Link}):
+\yura{Not clear}
 \[
 \langle \nabla f(x_t), x_t - x^* \rangle \le \|x_t - x^*\|_P \cdot \|P^{-1} \nabla f(x_t)\|_P.
 \]

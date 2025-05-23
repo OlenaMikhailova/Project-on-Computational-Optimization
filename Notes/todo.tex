@@ -1,0 +1,124 @@
+\documentclass[11pt,a4paper,reqno]{amsart}
+
+\usepackage{amsmath,amsfonts,amsbsy,amsgen,amscd,mathrsfs,amssymb,amsthm}
+\usepackage[font=footnotesize]{caption} 
+
+\usepackage[dvipsnames]{xcolor}
+ \definecolor{darkgreen}{rgb}{0,0.5,0}
+ \definecolor{darkblue}{rgb}{0,0.08,0.45}
+ \definecolor{rust}{rgb}{0.5,0.1,0.1}
+
+
+\usepackage{enumerate}
+
+
+\usepackage{bm}
+
+
+\usepackage{newtxtext}
+\usepackage[uprightGreek]{newtxmath}
+
+
+\numberwithin{equation}{section}
+
+ 
+\usepackage{mathtools}
+\usepackage{booktabs,dcolumn}
+\usepackage{microtype}
+\usepackage{csquotes}
+
+\usepackage{empheq}
+
+
+\usepackage{hyperref}
+\hypersetup{
+        colorlinks=true,
+        linkcolor=darkblue,
+        citecolor=rust,
+        urlcolor=darkgreen
+      }
+\usepackage{cleveref}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+
+\newcommand{\n}[1]{\|#1 \|}
+\renewcommand{\a}{\alpha}
+\renewcommand{\b}{\beta}
+\newcommand{\la}{\lambda}
+\newcommand{\e}{\varepsilon}
+\renewcommand{\t}{\tau}
+\renewcommand{\th}{\theta}
+\newcommand{\s}{\sigma}
+\newcommand{\x}{\bar x}
+
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+ 
+\newcommand{\lr}[1]{\left\langle #1\right\rangle}
+
+
+ \usepackage[colorinlistoftodos,prependcaption,backgroundcolor=black!5!white,bordercolor=red]{todonotes}
+\newcommand{\yura}[1]{\todo[inline]{{\textbf{Y:} \emph{#1}}}}
+
+
+
+\title{TODO notes}
+\begin{document}
+\maketitle
+
+
+\section{Linear systems}\label{sec:lin}
+\textbf{Goal:} solve $Ax=b$ with $A\in \R^{n\times n}$ (possibly psd $A$), $b\in \R^{n}$.
+
+A fixed point equation that corresponds to the linear system is
+\begin{equation}
+  \label{gs:fixed}
+  x = x - M^{-1}(Ax-b)
+\end{equation}
+for any regular matrix $M\in \R^{n\times n}$. This equation suggests a successive iteration method
+\begin{equation}
+  \label{gs:suc_method}
+  x_{k+1} = x_k - M^{-1}(Ax_k-b)
+\end{equation}
+It converges whenever $\rho(I - M^{-1}A)<1$.
+\yura{Explain why and explain connection of \eqref{gs:suc_method} to gradient descent.}
+
+\bigskip
+If we represent $A = A_L + A_D + A_U$ as a sum of lower triangular,
+diagonal and upper triangular matrices and take $M = A_D + A_L$, we
+obtain the Gauss-Seidel method:
+\begin{equation}
+  \label{gs:gs}
+  x_{k+1} = (A_D+A_L)^{-1}(b-A_Ux_k)
+\end{equation}
+
+\bigskip 
+
+Let in \eqref{gs:fixed} $M = A_D$. Then we will arrive at the Jacobi
+method:
+\begin{equation}
+  \label{jac:jac}
+  x_{k+1} = A_D^{-1}(b - (A_L + A_U)x_k)
+\end{equation}
+
+You can read more on such and similar methods, for instance in this
+\href{https://www-users.cse.umn.edu/~saad/IterMethBook_2ndEd.pdf}{book, Chapter
+  4} or any other online material you will find
+
+\section{Adaptive stepsizes}
+\begin{enumerate}
+\item Read the \href{https://arxiv.org/pdf/1910.09529}{paper} (the first 6 pages) and
+  understand its analysis.
+  
+\item Improve its analysis for a convex quadratic function
+  $f(x) = \frac 12 \lr{Ax,x} - \lr{b,x}$.
+
+  
+\item Use these new stepsize in the setting of \Cref{sec:lin}.
+\end{enumerate}
+
+
+\end{document}

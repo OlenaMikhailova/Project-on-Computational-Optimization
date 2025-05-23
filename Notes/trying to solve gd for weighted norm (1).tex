@@ -11,7 +11,12 @@
 \newcommand{\grad}{\nabla}             % Standard gradient
 \newcommand{\gradp}{\nabla_P}
 \newcommand{\ipp}[2]{\langle #1, #2 \rangle_P} % P-inner product
-% -----------------------
+
+\usepackage[colorinlistoftodos,prependcaption,backgroundcolor=black!5!white,bordercolor=red]{todonotes}
+\newcommand{\yura}[1]{\todo[inline]{{\textbf{Y:} \emph{#1}}}}
+
+
+%-----------------------
 
 \begin{document}
 
@@ -206,11 +211,10 @@ where $\alpha > 0$ is the step size (learning rate).
           \begin{equation} \label{eq:lp_smoothness}
               \normp{\gradp f(x) - \gradp f(y)} \le L_P \normp{x - y} \quad \forall x, y \in \R^n
           \end{equation}
-          This assumption is equivalent to the following inequality (the $P$-Descent Lemma):
+\yura{Correct, but why is this true?}                    This assumption is equivalent to the following inequality (the $P$-Descent Lemma):
           \begin{equation} \label{eq:p_descent_lemma}
               f(y) \le f(x) + \ipp{\gradp f(x)}{y-x} + \frac{L_P}{2} \normp{y-x}^2
           \end{equation}
-          
     \item \textbf{Existence of a minimizer}: There exists $x^* \in \R^n$ such that $f(x^*) = f^* = \min_{x \in \R^n} f(x)$. For convex $f$, this implies $\grad f(x^*) = 0$, and consequently $\gradp f(x^*) = P^{-1} 0 = 0$.
 \end{enumerate}
 
@@ -236,7 +240,7 @@ This shows that the function value decreases at each step, provided $\gradp f(x_
 Consider the squared $P$-norm of the distance from $x_{k+1}$ to $x^*$:
 \begin{align*}
     \normp{x_{k+1} - x^*}^2 &= \normp{x_k - \alpha \gradp f(x_k) - x^*}^2 \\
-    &= \normp{(x_k - x^*) - \alpha \gradp f(x_k)}_P^2 \\
+    &= \normp{(x_k - x^*) - \alpha \gradp f(x_k)}^2 \\
     &= \normp{x_k - x^*}^2 - 2 \ipp{x_k - x^*}{\alpha \gradp f(x_k)} + \normp{\alpha \gradp f(x_k)}^2 \\
     &= \normp{x_k - x^*}^2 - 2 \alpha \ipp{\gradp f(x_k)}{x_k - x^*} + \alpha^2 \normp{\gradp f(x_k)}^2
 \end{align*}
