@@ -1,0 +1,114 @@
+\documentclass[11pt,a4paper,reqno]{article}
+
+\usepackage[utf8]{inputenc} % For UTF-8 encoding
+\usepackage[english]{babel} % For English language settings
+\usepackage{amsmath,amsfonts,amsbsy,amsgen,amscd,mathrsfs,amssymb,amsthm}
+\usepackage{bm} % For bold mathematical symbols
+\usepackage{hyperref}
+\hypersetup{
+        colorlinks=true,
+        linkcolor=blue,
+        citecolor=red,
+        urlcolor=green
+      }
+\usepackage{enumerate} % For customizing lists
+
+% New commands for mathematical symbols
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\n}[1]{\|#1\|} % Shorthand for vector/matrix norm
+\newcommand{\lr}[1]{\left\langle #1\right\rangle}
+
+\title{Solving Linear Systems: Explanation}
+\author{} % You can put your name here
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Solving Linear Systems $Ax=b$}
+\label{sec:lin_systems}
+
+The given task is to solve the linear system of equations $Ax=b$, where $A \in \R^{n \times n}$ is a square matrix and $b \in \R^n$ is a vector.
+
+Consider the general iterative method:
+\begin{equation}
+  \label{eq:general_iter}
+  x_{k+1} = x_k - M^{-1}(Ax_k-b)
+\end{equation}
+where $M \in \R^{n \times n}$ is an arbitrary non-singular (regular) matrix.
+
+\subsection{Explanation of the Iterative Method's Convergence}
+To analyze the convergence of this method, let's define the error at step $k$ as $e_k = x_k - x^*$, where $x^*$ is the exact solution to the system $Ax=b$.
+We can rewrite the iterative method \eqref{eq:general_iter} as:
+\begin{align*}
+  x_{k+1} &= x_k - M^{-1}Ax_k + M^{-1}b \\
+  x_{k+1} &= (I - M^{-1}A)x_k + M^{-1}b
+\end{align*}
+Let $G = I - M^{-1}A$. This matrix $G$ is called the \emph{iteration matrix}. Then:
+$x_{k+1} = G x_k + M^{-1}b$.
+
+Since $x^*$ is the exact solution, it also satisfies this same formula: $x^* = G x^* + M^{-1}b$.
+Subtracting this from the previous equation:
+$x_{k+1} - x^* = G x_k - G x^*$
+$x_{k+1} - x^* = G (x_k - x^*)$
+Substituting the definition of the error, we get:
+\begin{equation}
+  \label{eq:error_eq}
+  e_{k+1} = G e_k
+\end{equation}
+This equation shows how the error changes from one iteration to the next. Recursively applying it, we get:
+$e_k = G^k e_0$, where $e_0 = x_0 - x^*$ is the initial error.
+
+\paragraph{Convergence Condition via Norms:}
+For the method to converge, we require that the error $\|e_k\|$ approaches zero as the number of iterations $k$ tends to infinity.
+Taking the norm of both sides of the error equation \eqref{eq:error_eq}:
+$\|e_{k+1}\| = \|G e_k\|$
+
+We know that for any matrix $G$ and vector $v$, $\|Gv\| \le \|G\| \|v\|$, where $\|G\|$ is a \emph{matrix norm} (which measures how much a matrix can "stretch" a vector).
+Therefore, $\|e_{k+1}\| \le \|G\| \|e_k\|$.
+
+If $\|G\| < 1$ (for any consistent matrix norm), it means that at each step, the "size" of the error decreases by at least a factor of $\|G\|$.
+This leads to:
+$\|e_k\| \le \|G\|^k \|e_0\|$
+
+Since $\|G\| < 1$, $\|G\|^k$ approaches zero as $k \to \infty$. Thus, $\|e_k\| \to 0$, which means that the sequence $x_k$ converges to the exact solution $x^*$.
+
+\paragraph{The Sharpest Convergence Condition (Spectral Radius):}
+While the condition $\|G\| < 1$ for any matrix norm is sufficient for convergence, there is a most precise (necessary and sufficient) condition. It is related to the \emph{eigenvalues} of the matrix $G$.
+The eigenvalues $\lambda$ of a matrix $G$ are scalars for which there exists a non-zero vector $v$ (eigenvector) such that $Gv = \lambda v$. An eigenvalue $\lambda$ indicates by how much the eigenvector $v$ is "stretched" or "compressed" by the action of matrix $G$.
+
+The \emph{spectral radius} of matrix $G$, denoted as $\rho(G)$, is the largest modulus (absolute value) among all its eigenvalues:
+$$ \rho(G) = \max \{|\lambda| : \lambda \text{ is an eigenvalue of } G\} $$
+
+
+This explains why the "largest stretching factor" (which is the spectral radius) for the iteration matrix $G$ must be less than one. If it is less than 1, then with each iteration, the error is guaranteed to decrease, and the method will converge to the exact solution.
+
+\subsection{Connection to Gradient Descent}
+Solving the linear system $Ax=b$ (provided that the matrix $A$ is symmetric and positive definite) is equivalent to finding the minimum of the quadratic function:
+\begin{equation*}
+  f(x) = \frac{1}{2} x^T A x - b^T x
+\end{equation*}
+The gradient of this function is computed as:
+\begin{equation*}
+  \nabla f(x) = Ax - b
+\end{equation*}
+The general formula for the gradient descent method is:
+\begin{equation}
+  \label{eq:grad_desc}
+  x_{k+1} = x_k - \alpha_k \nabla f(x_k)
+\end{equation}
+where $\alpha_k > 0$ is the step size at the $k$-th iteration.
+
+Substituting the expression for the gradient into \eqref{eq:grad_desc}, we get:
+\begin{equation*}
+  x_{k+1} = x_k - \alpha_k (Ax_k - b)
+\end{equation*}
+Let's compare this formula with the original iterative method \eqref{eq:general_iter}:
+\begin{equation*}
+  x_{k+1} = x_k - M^{-1}(Ax_k-b)
+\end{equation*}
+We can see that the gradient descent method is a special case of the iterative method \eqref{eq:general_iter} if the matrix $M^{-1}$ is a scalar multiple of the identity matrix, i.e., $M^{-1} = \alpha_k I$, where $I$ is the identity matrix, and $\alpha_k$ is the step size. In this case, $M = \frac{1}{\alpha_k}I$.
+
+In a more general case, when $M^{-1}$ is a non-scalar matrix, the iterative method \eqref{eq:general_iter} corresponds to \textit{preconditioned gradient descent}. The matrix $M^{-1}$ in this context acts as a \textit{preconditioner}, which reshapes the geometry of the space or scales the gradient direction to accelerate the algorithm's convergence. The choice of matrix $M$ (such as $A_D$ for the Jacobi method or $A_D+A_L$ for the Gauss-Seidel method) essentially defines the preconditioning strategy for solving the linear system.
+
+\end{document}

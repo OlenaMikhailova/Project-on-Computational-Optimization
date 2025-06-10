@@ -1,0 +1,78 @@
+\documentclass[11pt,a4paper,reqno]{article}
+
+\usepackage[utf8]{inputenc} % For UTF-8 encoding
+\usepackage[english]{babel} % For English language settings
+\usepackage{amsmath,amsfonts,amsbsy,amsgen,amscd,mathrsfs,amssymb,amsthm}
+\usepackage{bm} % For bold mathematical symbols
+\usepackage{hyperref}
+\hypersetup{
+        colorlinks=true,
+        linkcolor=blue,
+        citecolor=red,
+        urlcolor=green
+      }
+\usepackage{enumerate} % For customizing lists
+
+% New commands for mathematical symbols
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\n}[1]{\|#1\|} % Shorthand for vector/matrix norm
+\newcommand{\lr}[1]{\left\langle #1\right\rangle}
+
+\title{Task 2: Adaptive Stepsizes -- Solution}
+\author{} % You can put your name here
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Task 2: Adaptive Stepsizes} % Main section for Task 2
+
+\subsection{Solution for Improving the Analysis for a Convex Quadratic Function}
+\label{sec:quadratic_improvement_solution}
+
+\textbf{Task:} Improve the convergence analysis of the methods presented in the paper for the specific case of a convex quadratic function of the form $f(x) = \frac 12 \lr{Ax,x} - \lr{b,x}$.
+
+\subsubsection{Key Properties of Quadratic Functions}
+For a convex quadratic function $f(x) = \frac 12 x^T A x - b^T x$, where $A \in \R^{n \times n}$ is a symmetric positive definite (SPD) matrix, we have the following crucial properties:
+\begin{itemize}
+    \item The gradient is linear: $\nabla f(x) = Ax - b$.
+    \item The Hessian (second derivative) is constant: $\nabla^2 f(x) = A$.
+    \item The function is strongly convex. If $\mu$ and $L$ are the smallest and largest eigenvalues of $A$ respectively, then $f(x)$ is $\mu$-strongly convex and its gradient is $L$-Lipschitz.
+    \item The unique minimizer $x^*$ satisfies $Ax^*=b$.
+\end{itemize}
+
+\subsubsection{Simplification of Adaptive Step Size Rule}
+The adaptive step size $\lambda_k$ in Algorithm 1 of the paper is defined as:
+$$ \lambda_k = \min \left\{ \sqrt{1 + \theta_{k-1}} \lambda_{k-1}, \frac{\|x_k - x_{k-1}\|}{2\|\nabla f(x_k) - \nabla f(x_{k-1})\|} \right\} $$
+For a quadratic function, we can simplify the second term.
+Let $e_k = x_k - x^*$ be the error at iteration $k$. Then $\nabla f(x_k) = Ax_k - b = A(x_k - x^*) = A e_k$.
+The difference in gradients can be expressed as:
+$$ \nabla f(x_k) - \nabla f(x_{k-1}) = (Ax_k - b) - (Ax_{k-1} - b) = A(x_k - x_{k-1}) $$
+Substituting this into the second term for $\lambda_k$:
+$$ \frac{\|x_k - x_{k-1}\|}{2\|\nabla f(x_k) - \nabla f(x_{k-1})\|} = \frac{\|x_k - x_{k-1}\|}{2\|A(x_k - x_{k-1})\|} $$
+Let $v = x_k - x_{k-1}$. Then this term becomes $\frac{\|v\|}{2\|Av\|}$.
+Since $A$ is SPD, we know that for any non-zero vector $v$:
+$$ \lambda_{\min}(A) \|v\|^2 \le \lr{Av,v} \le \lambda_{\max}(A) \|v\|^2 $$
+and also
+$$ \lambda_{\min}(A) \|v\| \le \|Av\| \le \lambda_{\max}(A) \|v\| $$
+Therefore, the term $\frac{\|v\|}{2\|Av\|}$ is bounded:
+$$ \frac{1}{2\lambda_{\max}(A)} \le \frac{\|v\|}{2\|Av\|} \le \frac{1}{2\lambda_{\min}(A)} $$
+This provides an explicit range for the second part of the step size choice, depending directly on the eigenvalues of $A$.
+
+
+\subsection{Solution for Applying New Stepsizes in Solving Linear Systems}
+\label{sec:application_solution}
+
+\textbf{Task:} Use these new (improved) rules for step size selection in the context of solving linear systems $Ax=b$.
+
+\subsubsection{Algorithm Integration}
+The problem of solving a linear system $Ax=b$ is equivalent to minimizing the quadratic function $f(x) = \frac 12 x^T A x - b^T x$. Therefore, the adaptive gradient descent algorithm from the paper can be directly applied.
+The iterative scheme becomes:
+\begin{align*}
+  x_{k+1} &= x_k - \lambda_k (Ax_k - b) \\
+  \lambda_k &= \min \left\{ \sqrt{1 + \theta_{k-1}} \lambda_{k-1}, \frac{\|x_k - x_{k-1}\|}{2\|A(x_k - x_{k-1})\|} \right\} \\
+  \theta_k &= \frac{\lambda_k}{\lambda_{k-1}}
+\end{align*}
+with $x_0 \in \R^d$, $\lambda_0 > 0$, $\theta_0 = +\infty$.
+
+\end{document}
