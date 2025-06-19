@@ -1,0 +1,80 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, geometry}
+\usepackage{mathtools}
+\usepackage{lmodern}
+\usepackage{bm}
+
+\geometry{margin=1in}
+
+\title{Optimal Step Size for Gradient Descent on a Quadratic Function}
+\date{}
+\begin{document}
+
+\maketitle
+
+\section*{Problem Setting}
+
+Consider the quadratic function:
+\[
+f(x) = \frac{1}{2} x^\top A x - b^\top x + c,
+\]
+where \( A \in \mathbb{R}^{d \times d} \) is a symmetric positive definite matrix, \( b \in \mathbb{R}^d \), and \( c \in \mathbb{R} \) is a constant.
+
+Its gradient is:
+\[
+\nabla f(x) = A x - b.
+\]
+
+\section*{Gradient Descent Update Rule}
+
+The update rule of gradient descent is:
+\[
+x_{k+1} = x_k - \alpha_k \nabla f(x_k),
+\]
+where \( \alpha_k \) is the step size at iteration \( k \).
+
+\section*{Optimal Step Size Derivation}
+
+We seek to minimize the function along the gradient direction:
+\[
+\phi(\alpha) = f(x_k - \alpha \nabla f(x_k)).
+\]
+
+Let \( g_k := \nabla f(x_k) = A x_k - b \). Then:
+\[
+\phi(\alpha) = f(x_k - \alpha g_k) = \frac{1}{2} (x_k - \alpha g_k)^\top A (x_k - \alpha g_k) - b^\top (x_k - \alpha g_k) + c.
+\]
+
+Expanding:
+\[
+\phi(\alpha) = \frac{1}{2} x_k^\top A x_k - \alpha x_k^\top A g_k + \frac{1}{2} \alpha^2 g_k^\top A g_k - b^\top x_k + \alpha b^\top g_k + c.
+\]
+
+This is a quadratic function in \( \alpha \), so the minimizer is found by taking derivative:
+\[
+\phi'(\alpha) = - x_k^\top A g_k + \alpha g_k^\top A g_k + b^\top g_k = 0.
+\]
+
+Recall \( g_k = A x_k - b \), so \( b = A x_k - g_k \). Substitute:
+\[
+- x_k^\top A g_k + \alpha g_k^\top A g_k + x_k^\top A g_k - g_k^\top g_k = 0.
+\]
+
+Simplify:
+\[
+\alpha g_k^\top A g_k - g_k^\top g_k = 0,
+\]
+\[
+\alpha_k = \frac{g_k^\top g_k}{g_k^\top A g_k} = \frac{\| \nabla f(x_k) \|^2}{\nabla f(x_k)^\top A \nabla f(x_k)}.
+\]
+
+\section*{Conclusion}
+
+The optimal step size for each iteration of gradient descent applied to a quadratic function is:
+\[
+\boxed{ \alpha_k = \frac{ \| \nabla f(x_k) \|^2 }{ \nabla f(x_k)^\top A \nabla f(x_k) } }.
+\]
+
+This choice of \( \alpha_k \) ensures the fastest decrease of the function value along the gradient direction at each iteration. Since \( A \) is positive definite, this step size leads to convergence to the global minimum.
+
+\end{document}
